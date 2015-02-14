@@ -4,91 +4,116 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Vibrator;
-import android.view.View;
 
-
+/**
+ * Responsible for the metronome playback logistics. Supports vibration and
+ * audio clicks.
+ */
 public class Metronome {
 
-    private boolean mIsRunning = false;
+    private boolean mIsRunning;
     private int mBeatsTicked;
-    private int mBeatsInBar = getMPeriod4;
+    private int mSignature;
     private MediaPlayer mediaPlayer;
     private Context mContext;
-    private Vibrator mVibrator;
-    private View mBackground;
     private int mMilliSecondsBetweenTicks;
+    private MetronomeData mProperties;
+    private Handler mHandler;
     private static Metronome instance;
 
 
-
-    private Metronome(Context context, Vibrator vibrator, View view) {
+    private Metronome(Context context, MetronomeData properties) {
         // Singleton constructor
-        mContext = context;
-        mVibrator = vibrator;
-        mBackground = view;
+        mIsRunning = false;
         mBeatsTicked = 0;
+        mSignature = context.getResources().getInteger(R.integer.signature);
+        mContext = context;
         mediaPlayer = new MediaPlayer();
+        mProperties = properties;
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message message) {
+                mBeatsTicked++;
+                tick();
+            }
+        };
     }
 
-    public Metronome getInstance(Context context, Vibrator vibrator, View view) {
-        if(instance == null) {
-            instance = new Metronome(context, vibrator, view);
-        }
-        return instance;
-    }
+    /**
+     * Start metronome playback
+     *
+     * @param isVibrate set to true to enable vibration
+     */
+    public void play(boolean isVibrate) {
+        //TODO: get bpm from mProperties
+        int bpm = 120;
 
-    public void startTick(int mBpm) {
         //start the ticking
         mIsRunning = true;
         mBeatsTicked = 0;
         mediaPlayer.create(mContext, R.raw.clap);
-
-        mMilliSecondsBetweenTicks = 60000 / mBpm;
-
+        mMilliSecondsBetweenTicks = 60000 / bpm;
         tick();
-
     }
 
-    public void tick() {
-        //stop the ticking if stop button was pressed
-        if(!mIsRunning) return;
-        if(mBeatsTicked - mBeatsInBar == 0) {
+    /**
+     * Stop the metronome playback
+     */
+    public void stop() {
+        mIsRunning = false;
+        mBeatsTicked = 0;
+        mHandler.removeMessages(1);
+    }
+
+    /**
+     * @return Playback properties
+     */
+    public MetronomeData getProperties() {
+        return mProperties;
+    }
+
+    /**
+     * Update properties for metronome playback
+     * @param properties
+     */
+    public void setProperties(MetronomeData properties) {
+        mProperties = properties;
+        //TODO: check for updated property fields
+    }
+
+    /**
+     * Handle one metronome beat
+     */
+    private void tick() {
+        // if metronome is disabled, do nothing
+        if (!mIsRunning) return;
+
+        if (mBeatsTicked - mSignature == 0) {
+            //first tick of the bar
+
             mBeatsTicked = 0;
+            mediaPlayer.start();
+        } else {
+            //tick in the middle of bar
 
             mediaPlayer.start();
-            // DO ACTION when ran all times in the bar
-        }
-        else {
-            mediaPlayer.start();
-            // DO ACTION normal case
-
         }
 
-        // calls handler to tick with a delay, works recursively
+        // schedule next tick
         mHandler.sendMessageDelayed(mHandler.obtainMessage(1), mMilliSecondsBetweenTicks);
     }
 
-    public void stopTick() {
-        //called when stop button is pressed to stop tick
-        mIsRunning = false;
-        mBeatsTicked = 0;
-
-        mHandler.removeMessage(1);
-    }
-
-    private Handler mHandler = new Handler() {
-        // I think this method must be called handleMessage
-        // It is responsible for ticking async but still affect
-        // UI Thread
-        @Override
-        public void handleMessage(Message message) {
-            mBeatsTicked++;
-            tick();
-        }
-    };
-
+    /**
+     * @return handler for scheduling metronome beats
+     */
     public Handler getHandler() {
         return mHandler;
+    }
+
+    public Metronome getInstance(Context context, MetronomeData data) {
+        if (instance == null) {
+            instance = new Metronome(context, data);
+        }
+        return instance;
     }
 }
