@@ -27,3 +27,4 @@ proguard/
 
 # Android Studio Files
 *.iml
+*/.idea/
