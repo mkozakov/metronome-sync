@@ -129,7 +129,7 @@ public class Metronome implements Observer {
         return mHandler;
     }
 
-    public Metronome getInstance(Context context, MetronomeData data) {
+    public static Metronome getInstance(Context context, MetronomeData data) {
         if (instance == null) {
             instance = new Metronome(context, data);
         }
