@@ -28,7 +28,7 @@ public class Metronome implements Observer {
         // Singleton constructor
         mIsRunning = false;
         mBeatsTicked = 0;
-        mSignature = context.getResources().getInteger(R.integer.signature);
+        mSignature = context.getResources().getInteger(R.integer.default_signature);
         mContext = context;
         mediaPlayer = new MediaPlayer();
         mProperties = properties;

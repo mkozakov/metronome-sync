@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <item name="signature" type="integer">4</item>
+    <item name="default_signature" type="integer">4</item>
 
 </resources>
