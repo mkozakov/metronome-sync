@@ -4,12 +4,14 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Responsible for the metronome playback logistics. Supports vibration and
  * audio clicks.
  */
-public class Metronome {
+public class Metronome implements Observer {
 
     private boolean mIsRunning;
     private int mBeatsTicked;
@@ -45,14 +47,11 @@ public class Metronome {
      * @param isVibrate set to true to enable vibration
      */
     public void play(boolean isVibrate) {
-        //TODO: get bpm from mProperties
-        int bpm = 120;
-
         //start the ticking
         mIsRunning = true;
         mBeatsTicked = 0;
         mediaPlayer.create(mContext, R.raw.clap);
-        mMilliSecondsBetweenTicks = 60000 / bpm;
+        updateTempo();
         tick();
     }
 
@@ -79,6 +78,26 @@ public class Metronome {
     public void setProperties(MetronomeData properties) {
         mProperties = properties;
         //TODO: check for updated property fields
+    }
+
+    /**
+     * TODO: Implement me
+     * Updates all observers with the current BPM
+     *
+     * @param metronomeData metronome properties that were changed
+     * @param obj will be ignored
+     */
+    public void update(Observable metronomeData, Object obj) {
+        if(mIsRunning) {
+            updateTempo();
+        }
+    }
+
+    /**
+     * Change the delay between ticks based on the current bpm
+     */
+    private void updateTempo() {
+        mMilliSecondsBetweenTicks = 60000 / mProperties.getBPM();
     }
 
     /**
