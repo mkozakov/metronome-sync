@@ -81,6 +81,13 @@ public class Metronome implements Observer {
     }
 
     /**
+     * @return true if the metronome is currently active
+     */
+    public boolean isRunning() {
+        return mIsRunning;
+    }
+
+    /**
      * TODO: Implement me
      * Updates all observers with the current BPM
      *
