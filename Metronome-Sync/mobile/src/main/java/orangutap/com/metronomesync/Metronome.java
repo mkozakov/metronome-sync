@@ -4,6 +4,8 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
+
 import java.util.Observable;
 import java.util.Observer;
 
@@ -13,10 +15,10 @@ import java.util.Observer;
  */
 public class Metronome implements Observer {
 
+    private Vibrator vibrator;
     private boolean mIsRunning;
-    private int mBeatsTicked;
-    private int mSignature;
-    private MediaPlayer mediaPlayer;
+    private int beatsTicked;
+    private int timeSignature;
     private Context mContext;
     private int mMilliSecondsBetweenTicks;
     private MetronomeData mProperties;
@@ -27,15 +29,15 @@ public class Metronome implements Observer {
     private Metronome(Context context, MetronomeData properties) {
         // Singleton constructor
         mIsRunning = false;
-        mBeatsTicked = 0;
-        mSignature = context.getResources().getInteger(R.integer.default_signature);
+        beatsTicked = 0;
+        timeSignature = context.getResources().getInteger(R.integer.default_signature);
         mContext = context;
-        mediaPlayer = new MediaPlayer();
+        vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mProperties = properties;
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
-                mBeatsTicked++;
+                beatsTicked++;
                 tick();
             }
         };
@@ -49,8 +51,7 @@ public class Metronome implements Observer {
     public void play(boolean isVibrate) {
         //start the ticking
         mIsRunning = true;
-        mBeatsTicked = 0;
-        mediaPlayer.create(mContext, R.raw.clap);
+        beatsTicked = 0;
         updateTempo();
         tick();
     }
@@ -60,7 +61,7 @@ public class Metronome implements Observer {
      */
     public void stop() {
         mIsRunning = false;
-        mBeatsTicked = 0;
+        beatsTicked = 0;
         mHandler.removeMessages(1);
     }
 
@@ -114,15 +115,13 @@ public class Metronome implements Observer {
         // if metronome is disabled, do nothing
         if (!mIsRunning) return;
 
-        if (mBeatsTicked - mSignature == 0) {
+        if (beatsTicked - timeSignature == 0) {
             //first tick of the bar
-
-            mBeatsTicked = 0;
-            mediaPlayer.start();
+            vibrator.vibrate(200);
+            beatsTicked = 0;
         } else {
             //tick in the middle of bar
-
-            mediaPlayer.start();
+            vibrator.vibrate(100);
         }
 
         // schedule next tick
