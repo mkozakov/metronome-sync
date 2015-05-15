@@ -10,7 +10,6 @@ import java.util.Observable;
 
 public class MetronomeData extends Observable {
     /**
-     * TODO: Implement me
      * MetronomeData is a singleton class, extends observable
      */
 

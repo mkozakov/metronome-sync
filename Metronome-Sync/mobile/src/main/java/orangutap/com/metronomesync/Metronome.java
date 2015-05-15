@@ -1,7 +1,6 @@
 package orangutap.com.metronomesync;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
@@ -15,29 +14,39 @@ import java.util.Observer;
  */
 public class Metronome implements Observer {
 
-    private Vibrator vibrator;
-    private boolean mIsRunning;
-    private int beatsTicked;
-    private int timeSignature;
-    private Context mContext;
-    private int mMilliSecondsBetweenTicks;
-    private MetronomeData mProperties;
-    private Handler mHandler;
-    private static Metronome instance;
 
+    private Vibrator mVibrator;         /* This controls the vibrating service */
+    private boolean mIsRunning;         /* A boolean that says whether
+                                        the metronome is vibrating */
+    private int mBeatsTicked;           /* Represents the current beat in the bar
+                                           of the time signature */
+    private int mTimeSignature;         /* The time signature */
+    private Context mContext;           /* The context the class is currently in */
+    private int mMilliSecondsBetweenTicks; /* milliseconds between each tick determined
+                                              by the bpm */
+    private MetronomeData mProperties;  /* The current settings of the metronome */
+    private Handler mHandler;           /* A handler class to handle the async vibrating */
+    private static Metronome instance;  /* Singleton Metronome instance */
 
+    /**
+     * Singleton class that controls all the backend activities for the
+     * metronome
+     * @param context the context the class is currently in
+     * @param properties the settings of the metronome
+     */
     private Metronome(Context context, MetronomeData properties) {
         // Singleton constructor
+        // Initialization of private variables
         mIsRunning = false;
-        beatsTicked = 0;
-        timeSignature = context.getResources().getInteger(R.integer.default_signature);
-        mContext = context;
-        vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        mBeatsTicked = 0;
+        mTimeSignature = context.getResources().getInteger(R.integer.default_signature);
+        this.mContext = context;
+        mVibrator = (Vibrator) this.mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mProperties = properties;
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
-                beatsTicked++;
+                mBeatsTicked++;
                 tick();
             }
         };
@@ -51,7 +60,7 @@ public class Metronome implements Observer {
     public void play(boolean isVibrate) {
         //start the ticking
         mIsRunning = true;
-        beatsTicked = 0;
+        mBeatsTicked = 0;
         updateTempo();
         tick();
     }
@@ -61,7 +70,7 @@ public class Metronome implements Observer {
      */
     public void stop() {
         mIsRunning = false;
-        beatsTicked = 0;
+        mBeatsTicked = 0;
         mHandler.removeMessages(1);
     }
 
@@ -89,7 +98,6 @@ public class Metronome implements Observer {
     }
 
     /**
-     * TODO: Implement me
      * Updates all observers with the current BPM
      *
      * @param metronomeData metronome properties that were changed
@@ -115,13 +123,14 @@ public class Metronome implements Observer {
         // if metronome is disabled, do nothing
         if (!mIsRunning) return;
 
-        if (beatsTicked - timeSignature == 0) {
+        if (mBeatsTicked - mTimeSignature == 0) {
             //first tick of the bar
-            vibrator.vibrate(200);
-            beatsTicked = 0;
+
+            mVibrator.vibrate(100);
+            mBeatsTicked = 0;
         } else {
             //tick in the middle of bar
-            vibrator.vibrate(100);
+            mVibrator.vibrate(100);
         }
 
         // schedule next tick
