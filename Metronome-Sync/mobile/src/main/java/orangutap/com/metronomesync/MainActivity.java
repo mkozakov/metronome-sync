@@ -69,9 +69,10 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     if(metronome.isRunning()) {
-                        metronome.stop();
+                        metronome.stopSounding();
                     } else {
-                        metronome.play(true);
+                        metronome.playSounding();
+//                        metronome.play(true);
                     }
                 }
             });

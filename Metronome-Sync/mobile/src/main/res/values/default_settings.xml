@@ -2,7 +2,7 @@
 <resources>
 
     <item name="default_signature" type="integer">4</item>
-    <item name="default_bpm" type="integer">120</item>
+    <item name="default_bpm" type="integer">100</item>
     <item name="min_bpm" type="integer">40</item>
     <item name="max_bpm" type="integer">250</item>
 
