@@ -14,6 +14,7 @@ import java.util.Observer;
  */
 public class Metronome implements Observer {
 
+
     private Vibrator mVibrator;         /* This controls the vibrating service */
     private boolean mIsRunning;         /* A boolean that says whether
                                         the metronome is vibrating */
