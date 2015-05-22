@@ -10,8 +10,6 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.util.Currency;
-
 
 public class MainActivity extends Activity {
 
