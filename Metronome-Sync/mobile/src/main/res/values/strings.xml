@@ -9,11 +9,17 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="tap_tempo">Tap Tempo!</string>
     <string name="time_sig">Time</string>
-    <string-array name="time_sig_array">
-        <item>1/4</item>
-        <item>2/4</item>
-        <item>3/4</item>
-        <item>4/4</item>
+    <string-array name="time_sig_array_num">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string-array name="time_sig_array_den">
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+        <item>16</item>
     </string-array>
 
 </resources>

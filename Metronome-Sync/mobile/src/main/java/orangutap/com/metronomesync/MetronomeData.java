@@ -22,8 +22,9 @@ public class MetronomeData extends Observable {
      *
      * @param bpm The beats per minute of the metronome
      */
-    private MetronomeData(int bpm) {
+    private MetronomeData(int bpm, int timeSig) {
         mBpm = bpm;
+        mTimeSig = timeSig;
     }
 
     /**
@@ -65,9 +66,9 @@ public class MetronomeData extends Observable {
      * @param bpm The beats per minute of the metronome
      * @return The instance of MetronomeData
      */
-    public static MetronomeData getInstance(int bpm) {
+    public static MetronomeData getInstance(int bpm, int timeSig) {
         if (instance == null) {
-            instance = new MetronomeData(bpm);
+            instance = new MetronomeData(bpm, timeSig);
         } else {
             instance.setBPM(bpm);
         }

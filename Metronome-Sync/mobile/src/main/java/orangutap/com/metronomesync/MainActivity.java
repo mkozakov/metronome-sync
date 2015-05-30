@@ -2,7 +2,6 @@ package orangutap.com.metronomesync;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +32,9 @@ public class MainActivity extends Activity {
                     .commit();
         }
         // Initialize private variables
-        mMetronomeData = MetronomeData.getInstance(getResources().getInteger(R.integer.default_bpm));
+        mMetronomeData = MetronomeData.getInstance(getResources().getInteger(R.integer.default_bpm),
+                                                   getResources().getInteger(
+                                                           R.integer.default_signature) - 1);
         mMetronome = Metronome.getInstance(this, mMetronomeData);
     }
 
@@ -59,8 +60,10 @@ public class MainActivity extends Activity {
         private Button mPlayStopBtn;
         // The tap tempo button
         private Button mTapTempoBtn;
-        // The spinner to select time signature
-        private Spinner mTimeSigSpinner;
+        // The spinner to select time signature numerator
+        private Spinner mTimeSigSpinnerNum;
+        // The  spinner to select time signature denominator
+        private Spinner mTimeSigSpinnerDen;
         // Seek bar in the middle
         private SeekBar mBpmSeekBar;
         // The current bpm displayed large
@@ -120,15 +123,27 @@ public class MainActivity extends Activity {
             mTapTempoBtn = (Button) rootView.findViewById(R.id.tap_tempo_btn);
             mBpmSeekBar = (SeekBar) rootView.findViewById(R.id.bpm_seek);
             mBpmText = (TextView) rootView.findViewById(R.id.bpm_value);
-            mTimeSigSpinner = (Spinner) rootView.findViewById(R.id.time_sig_spinner);
+            mTimeSigSpinnerNum = (Spinner) rootView.findViewById(R.id.time_sig_spinner_num);
+            mTimeSigSpinnerDen = (Spinner) rootView.findViewById(R.id.time_sig_spinner_den);
+
+            /* SET BOTH SPINNER ADAPTERS */
+            // Create an ArrayAdapter using the string array and a default spinner layout
+            ArrayAdapter<CharSequence> adapter_num = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.time_sig_array_num, android.R.layout.simple_spinner_item);
+            // Specify the layout to use when the list of choices appears
+            adapter_num.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // Apply the adapter to the spinner
+            mTimeSigSpinnerNum.setAdapter(adapter_num);
 
             // Create an ArrayAdapter using the string array and a default spinner layout
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-                    R.array.time_sig_array, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter_den = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.time_sig_array_den, android.R.layout.simple_spinner_item);
             // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            adapter_den.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // Apply the adapter to the spinner
-            mTimeSigSpinner.setAdapter(adapter);
+            mTimeSigSpinnerDen.setAdapter(adapter_den);
+            MetronomeData data = ((MainActivity) getActivity()).getMetronomeData();
+            mTimeSigSpinnerNum.setSelection(data.getTimeSig());
 
             // Get singleton metronome backend class
             final Metronome metronome = ((MainActivity) getActivity()).getMetronome();
@@ -138,7 +153,7 @@ public class MainActivity extends Activity {
             final int maxBpm = getResources().getInteger(R.integer.max_bpm);
             final int defaultBpm = getResources().getInteger(R.integer.default_bpm);
 
-            mTimeSigSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            mTimeSigSpinnerNum.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                     MetronomeData data = ((MainActivity) getActivity()).getMetronomeData();
