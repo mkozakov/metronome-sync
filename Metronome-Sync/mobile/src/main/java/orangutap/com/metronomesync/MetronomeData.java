@@ -15,6 +15,7 @@ public class MetronomeData extends Observable {
 
     private static MetronomeData instance = null;
     private int mBpm;
+    private int mTimeSig;
 
     /**
      * MetronomeData constructor, sets mBpm to the initial bpm
@@ -40,6 +41,22 @@ public class MetronomeData extends Observable {
     public void setBPM(int bpm) {
         mBpm = bpm;
         notifyObservers();
+    }
+
+    /**
+     * Get the current Time Signature
+     */
+    public int getTimeSig() {
+        return mTimeSig;
+    }
+
+    /**
+     * Change The value of bpm the the value we get from getPBM
+     *
+     * @param timeSig The beats per minute of the metronome
+     */
+    public void setTimeSig(int timeSig) {
+        mTimeSig = timeSig;
     }
 
     /**

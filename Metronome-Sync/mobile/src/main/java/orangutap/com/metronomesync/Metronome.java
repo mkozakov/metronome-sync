@@ -107,6 +107,15 @@ public class Metronome implements Observer {
         if(mIsRunning) {
             updateTempo();
         }
+        updateTimeSig();
+    }
+
+
+    /**
+     * Change the delay between ticks based on the current bpm
+     */
+    private void updateTimeSig() {
+        mTimeSignature = mProperties.getTimeSig();
     }
 
     /**
@@ -126,7 +135,7 @@ public class Metronome implements Observer {
         if (mBeatsTicked - mTimeSignature == 0) {
             //first tick of the bar
 
-            mVibrator.vibrate(100);
+            mVibrator.vibrate(200);
             mBeatsTicked = 0;
         } else {
             //tick in the middle of bar

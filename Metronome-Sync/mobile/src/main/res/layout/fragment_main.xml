@@ -27,12 +27,20 @@
                 android:layout_height="wrap_content"
                 android:typeface="normal"
                 android:textSize="@dimen/abc_text_size_display_4_material"/>
-
-            <TextView android:text="@string/bpm"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/abc_text_size_display_2_material" />
-
+                android:orientation="vertical">
+                <Spinner
+                    android:id="@+id/time_sig_spinner"
+                    android:text="@string/time_sig"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" />
+                <TextView android:text="@string/bpm"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:textSize="@dimen/abc_text_size_display_2_material" />
+            </LinearLayout>
         </LinearLayout>
 
         <SeekBar
@@ -55,15 +63,21 @@
             android:background="#70D8D7"
             android:clickable="true" />
 
-        <Button
-            android:id="@+id/play_stop_btn"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/play_stop"
-            android:layout_marginTop="20dp"
-            android:layout_centerHorizontal="true"
-            android:background="#70D8D7"
-            android:clickable="true" />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/play_stop_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/play_stop"
+                android:layout_marginTop="20dp"
+                android:layout_centerHorizontal="true"
+                android:background="#70D8D7"
+                android:clickable="true" />
+        </LinearLayout>
 
 
     </LinearLayout>

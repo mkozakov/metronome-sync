@@ -2,12 +2,16 @@ package orangutap.com.metronomesync;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 
@@ -55,13 +59,15 @@ public class MainActivity extends Activity {
         private Button mPlayStopBtn;
         // The tap tempo button
         private Button mTapTempoBtn;
+        // The spinner to select time signature
+        private Spinner mTimeSigSpinner;
         // Seek bar in the middle
         private SeekBar mBpmSeekBar;
         // The current bpm displayed large
         private TextView mBpmText;
 
         // The time between previous tap tempo
-        private long[] mTapTempoArray = new long[] {0, 0, 0, 0 ,0};
+        private long[] mTapTempoArray = new long[]{0, 0, 0, 0, 0};
         // The time since last tap of tap tempo
         private long mLastTapTempo = 0;
         // The current time when clicking tap tempo button
@@ -74,6 +80,7 @@ public class MainActivity extends Activity {
         /**
          * Calculates the bpm from an array of longs representing milliseconds between taps of tap
          * tempo button
+         *
          * @param tapArray the array that holds the millisecond values
          * @return the new bpm!
          */
@@ -89,22 +96,20 @@ public class MainActivity extends Activity {
 
         /**
          * Pushes a value to the front of an array and deletes the last value
+         *
          * @param array array of longs representing milliseconds between taps of button
          * @param value the latest difference between taps!
          * @return the new array of the latest n taps! Woo!
          */
-        public long[] pushValue(long[] array, long value)
-        {
-            for(int i = array.length - 2; i >= 0; i--)
-            {
+        public long[] pushValue(long[] array, long value) {
+            for (int i = array.length - 2; i >= 0; i--) {
                 array[i + 1] = array[i];
             }
             array[0] = value;
             return array;
         }
 
-
-
+        // TODO: break into methods
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -115,6 +120,15 @@ public class MainActivity extends Activity {
             mTapTempoBtn = (Button) rootView.findViewById(R.id.tap_tempo_btn);
             mBpmSeekBar = (SeekBar) rootView.findViewById(R.id.bpm_seek);
             mBpmText = (TextView) rootView.findViewById(R.id.bpm_value);
+            mTimeSigSpinner = (Spinner) rootView.findViewById(R.id.time_sig_spinner);
+
+            // Create an ArrayAdapter using the string array and a default spinner layout
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.time_sig_array, android.R.layout.simple_spinner_item);
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // Apply the adapter to the spinner
+            mTimeSigSpinner.setAdapter(adapter);
 
             // Get singleton metronome backend class
             final Metronome metronome = ((MainActivity) getActivity()).getMetronome();
@@ -123,6 +137,20 @@ public class MainActivity extends Activity {
             final int minBpm = getResources().getInteger(R.integer.min_bpm);
             final int maxBpm = getResources().getInteger(R.integer.max_bpm);
             final int defaultBpm = getResources().getInteger(R.integer.default_bpm);
+
+            mTimeSigSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                    MetronomeData data = ((MainActivity) getActivity()).getMetronomeData();
+                    data.setTimeSig(position + 1);
+                    metronome.update(data, new Object());
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+                }
+
+            });
 
             // Listener for the tap tempo button
             // TODO: Break into smaller methods!
@@ -133,24 +161,20 @@ public class MainActivity extends Activity {
                     int newBpm;
                     mCurrentTapTempo = System.currentTimeMillis();
                     // If no last tap was recorded, this is the first!
-                    if ( mNumTaps == 0)
-                    {
+                    if (mNumTaps == 0) {
                         mLastTapTempo = mCurrentTapTempo;
                         mNumTaps++;
-                    }
-                    else {
+                    } else {
                         // calculate time between taps
                         mTimeBetweenTaps = mCurrentTapTempo - mLastTapTempo;
                         mLastTapTempo = mCurrentTapTempo;
                         // check if it was a long time since last tap
                         if (mTimeBetweenTaps > mTapTimeTimeout) {
                             mNumTaps = 0;
-                        }
-                        else
-                        {
+                        } else {
                             mTapTempoArray = pushValue(mTapTempoArray, mTimeBetweenTaps);
-                            if(mNumTaps < 3) mNumTaps++;
-                            if(mNumTaps >= 2) {
+                            if (mNumTaps < 3) mNumTaps++;
+                            if (mNumTaps >= 2) {
                                 newBpm = calculateBpm(mTapTempoArray);
                                 mBpmText.setText(Integer.toString(newBpm));
                                 // TODO: Turn this into a method, its also used in seek bar
@@ -165,7 +189,6 @@ public class MainActivity extends Activity {
                     }
 
 
-
                 }
             });
 
@@ -173,7 +196,7 @@ public class MainActivity extends Activity {
             mPlayStopBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(metronome.isRunning()) {
+                    if (metronome.isRunning()) {
                         metronome.stop();
                     } else {
                         metronome.play(true);
